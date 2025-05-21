@@ -118,4 +118,4 @@ python generator.py config.yaml
 
 - Pre-generated mazes for evaluation (256) can be downloaded from [here]().
 - Pre-generated validation trajectories (256 sequences) can be downloaded from [here]().
-- Pre-trained Div/Long models in can be downloaded from [here]().
+- Pre-trained Div/Long models in can be downloaded from [here](https://www.kaggle.com/models/zhongyuxuan/icsl_maze_div-long).
