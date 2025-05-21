@@ -116,6 +116,6 @@ python generator.py config.yaml
 
 # Download pre-generated datasets, tasks and pre-trained models
 
-- Pre-generated mazes for evaluation (256) can be downloaded from [here]().
+- Pre-generated mazes tasks for training (32000) can be downloaded from [here](https://www.kaggle.com/datasets/zhongyuxuan/maze-15-train-task).
 - Pre-generated validation trajectories (256 sequences) can be downloaded from [here]().
 - Pre-trained Div/Long models in can be downloaded from [here](https://www.kaggle.com/models/zhongyuxuan/icsl_maze_div-long).
