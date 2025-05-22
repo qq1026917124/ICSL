@@ -9,9 +9,9 @@ from collections import namedtuple
 from numpy import random as npyrnd
 from numpy.linalg import norm
 from copy import deepcopy
-from maze_generator.mazeworld.envs.grid_ops import genmaze_by_primwall
-from maze_generator.utils import pseudo_random_seed
-from maze_generator.mazeworld.envs.dynamics import PI
+from .grid_ops import genmaze_by_primwall
+from ...utils import pseudo_random_seed
+from .dynamics import PI
 
 def gen_static_text(cell_walls, textlib_walls, textlib_grounds, textlib_ceilings):
     n = cell_walls.shape[0]

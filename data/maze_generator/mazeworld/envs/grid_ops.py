@@ -1,7 +1,7 @@
 import numpy
 from numpy import random
 from attr import attrs, attrib
-from maze_generator.mazeworld.envs.utils import conv2d_numpy
+from .utils import conv2d_numpy
 
 """
 Generating Topology For A Maze

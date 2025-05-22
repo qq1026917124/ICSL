@@ -3,7 +3,7 @@ import pygame
 import time
 import random
 from numba import njit
-from maze_generator.mazeworld.envs.dynamics import PI, PI_4
+from .dynamics import PI, PI_4
 
 class LandmarksRGB(object):
     def __init__(self):

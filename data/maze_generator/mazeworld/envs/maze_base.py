@@ -9,10 +9,10 @@ import time
 from pygame import font
 from numpy import random as npyrnd
 from numpy.linalg import norm
-from maze_generator.mazeworld.envs.ray_caster_utils import landmarks_rgb, landmarks_color
-from maze_generator.mazeworld.envs.dynamics import PI
-from maze_generator.mazeworld.envs.task_sampler import MAZE_TASK_MANAGER
-from maze_generator.mazeworld.envs.ray_caster_utils import paint_agent_arrow
+from .ray_caster_utils import landmarks_rgb, landmarks_color
+from .dynamics import PI
+from .task_sampler import MAZE_TASK_MANAGER
+from .ray_caster_utils import paint_agent_arrow
 
 class MazeBase(object):
     def __init__(self, **kw_args):

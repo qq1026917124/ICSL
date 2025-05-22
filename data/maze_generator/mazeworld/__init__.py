@@ -13,12 +13,13 @@
 # limitations under the License.
 
 from gym.envs.registration import register
-from maze_generator.mazeworld.envs import MazeWorldContinuous3D
-from maze_generator.mazeworld.envs import MazeTaskSampler, Resampler, MazeStaticSampler, MazeSampleFromCellWalls
+
+from .envs import MazeWorldContinuous3D
+from .envs import MazeTaskSampler, Resampler, MazeStaticSampler, MazeSampleFromCellWalls
 
 register(
     id='mazeworld-v2',
-    entry_point='maze_generator.mazeworld:MazeWorldContinuous3D',
+    entry_point=MazeWorldContinuous3D,
     kwargs={
         "enable_render": True,
         "render_scale": 480,

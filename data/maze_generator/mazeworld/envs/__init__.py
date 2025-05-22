@@ -1,4 +1,4 @@
-from maze_generator.mazeworld.envs.maze_env import MazeWorldContinuous3D
-from maze_generator.mazeworld.envs.task_sampler import MAZE_TASK_MANAGER, MazeTaskSampler, Resampler, MazeStaticSampler, MazeSampleFromCellWalls
-from maze_generator.mazeworld.envs.grid_ops import genmaze_by_primwall
-from maze_generator.mazeworld.envs.utils import conv2d_numpy
+from .maze_env import MazeWorldContinuous3D
+from .task_sampler import MAZE_TASK_MANAGER, MazeTaskSampler, Resampler, MazeStaticSampler, MazeSampleFromCellWalls
+from .grid_ops import genmaze_by_primwall
+from .utils import conv2d_numpy

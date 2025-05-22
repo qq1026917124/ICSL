@@ -7,8 +7,8 @@ import pygame
 
 from gym import error, spaces, utils
 from gym.utils import seeding
-from maze_generator.mazeworld.envs.maze_continuous_3d import MazeCoreContinuous3D
-from maze_generator.mazeworld.envs.dynamics import DEFAULT_ACTION_SPACE_16, DEFAULT_ACTION_SPACE_32
+from .maze_continuous_3d import MazeCoreContinuous3D
+from .dynamics import DEFAULT_ACTION_SPACE_16, DEFAULT_ACTION_SPACE_32
 
 class MazeWorldEnvBase(gym.Env):
     """

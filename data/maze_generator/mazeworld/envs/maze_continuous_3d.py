@@ -9,11 +9,11 @@ import time
 from pygame import font
 from numpy import random as npyrnd
 from numpy.linalg import norm
-from maze_generator.mazeworld.envs.dynamics import PI, PI_2, PI_4, PI2d, vector_move_with_collision
-from maze_generator.mazeworld.envs.ray_caster_utils import maze_view
-from maze_generator.mazeworld.envs.task_sampler import MAZE_TASK_MANAGER
-from maze_generator.mazeworld.envs.maze_base import MazeBase
-from maze_generator.mazeworld.envs.ray_caster_utils import landmarks_rgb, landmarks_rgb_arr, paint_agent_arrow
+from .dynamics import PI, PI_2, PI_4, PI2d, vector_move_with_collision
+from .ray_caster_utils import maze_view
+from .task_sampler import MAZE_TASK_MANAGER
+from .maze_base import MazeBase
+from .ray_caster_utils import landmarks_rgb, landmarks_rgb_arr, paint_agent_arrow
 
 class MazeCoreContinuous3D(MazeBase):
     #Read Configurations
