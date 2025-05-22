@@ -1,8 +1,8 @@
 import gym
 import sys
 import argparse
-import maze_generator.mazeworld
-from maze_generator.mazeworld import MazeTaskSampler
+import ...mazeworld
+from ...mazeworld import MazeTaskSampler
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Playing the maze world demo with your keyboard')

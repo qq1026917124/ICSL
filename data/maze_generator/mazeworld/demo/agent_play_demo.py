@@ -2,9 +2,9 @@ import gym
 import sys
 import argparse
 import time
-import maze_generator.mazeworld
-from maze_generator.mazeworld import MazeTaskSampler
-from maze_generator.mazeworld.agents import SmartSLAMAgent, OracleAgent
+import ...mazeworld
+from ...mazeworld import MazeTaskSampler
+from ...mazeworld.agents import SmartSLAMAgent, OracleAgent
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Playing the maze world demo with your keyboard')
