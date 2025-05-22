@@ -12,7 +12,7 @@ All codes will be open-source after the paper is accepted.
 Sample mazes with the following command:
 
 ```bash
- python ./data/gen_maze_record.py \
+ python ./data/gen_maze_task.py \
 	 --output_path YOUR_TASK_PATH \   # file path to save tasks
 	 --task_number 1 \       # size of the task set
 	 --scale 9,16 \       # the range of number of grids per dimension
