@@ -55,7 +55,7 @@ python projects/MazeWorld/validate.py projects/MazeWorld/config.yaml --configs k
 
 ## Configuration
 
-The `config.yaml` file contains all the necessary configuration for running OmniRL. Each configuration item is composed of multiple keys and sub-keys, can be over-written by commandline arguments. For instance, 
+The `config.yaml` file contains all the necessary configuration for running ICSL. Each configuration item is composed of multiple keys and sub-keys, can be over-written by commandline arguments. For instance, 
 ```yaml
 model_config:
     image_encoder_block:
@@ -69,11 +69,11 @@ Below we explain key configuration items in detail.
 
 ### General configuration
 
-- **run_name**:  # Names airsoul will use to discrimate the run from the others in the logs
+- **run_name**:   Names airsoul will use to discrimate the run from the others in the logs
 
-- **master_port**: # A port used for connecting to the master node
+- **master_port**:  A port used for connecting to the master node
 
-- **load_model_path**: # Set to none in a cold start, or set to a path to load the model from a checkpoint
+- **load_model_path**:  Set to none in a cold start, or set to a path to load the model from a checkpoint
 
 ### Log configuration
 
@@ -94,7 +94,7 @@ Settings for training the model.
 
 - **seq_len**: Specify the sequence length loaded into the memory when training.
 - **seg_len**: Specify the segment length used in chunk-wise forward and backward pass.
-- **lr**, **lr_decay_interval**, **lr_start_step**: OmniRL apply noam decay with the warmup step specified by `lr_decay_interval`, use `lr_start_step` in cases of warm start.
+- **lr**, **lr_decay_interval**, **lr_start_step**: ICSL apply noam decay with the warmup step specified by `lr_decay_interval`, use `lr_start_step` in cases of warm start.
 
 ### Test configuration (test_config)
 
