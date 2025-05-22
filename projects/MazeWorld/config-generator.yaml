@@ -1,6 +1,6 @@
 ---
 run_name: YOUR_NAME_TO_RUN
-master_port: "12402"
+master_port: "12345"
 load_model_path: [Path or None]
 
 log_config:
@@ -157,6 +157,19 @@ model_config:
           checkpoints_density: -1
           memory_type: MEM
 
+test_config:
+    batch_size_vae: 1
+    batch_size_causal: 1
+    data_path: "./data/maze_15_test/"
+    epoch_vae_stop: 1
+    epoch_causal_start: -1
+
+    seq_len_vae: 300
+    seq_len_causal: 10000
+    seg_len_vae: 300
+    seg_len_causal: 1000
+
+    output: ./results15*15-causal-decoder-wm-DL-stage0/
 
 
 generator_config:
