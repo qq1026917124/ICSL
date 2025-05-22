@@ -7,7 +7,7 @@ import numpy
 import argparse
 import multiprocessing
 import pickle
-import .mazeworld
+from maze_generator import mazeworld
 from maze_generator.mazeworld import MazeTaskSampler, Resampler, MazeStaticSampler
 from maze_generator.mazeworld.agents import OracleAgent
 
