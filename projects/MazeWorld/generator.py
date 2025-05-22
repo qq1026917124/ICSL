@@ -4,7 +4,7 @@ import sys
 from src.models import E2EObjNav
 from src.utils import GeneratorRunner
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from maze_epoch import MAZEGenerator, general_generator
+from maze_epoch import interactive_trajectory, general_generator
 
 if __name__ == "__main__":
     print("Start generator test")
