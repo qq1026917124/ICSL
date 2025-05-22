@@ -3,10 +3,10 @@
 # File: test.py
 import gym
 import sys
-import l3c.mazeworld
+import ...mazeworld
 import time
-from l3c.mazeworld import MazeTaskSampler, Resampler
-from l3c.mazeworld.agents import SmartSLAMAgent
+from ...mazeworld import MazeTaskSampler, Resampler
+from ...mazeworld.agents import SmartSLAMAgent
 from numpy import random
 
 def test_agent_maze(max_steps=1000):

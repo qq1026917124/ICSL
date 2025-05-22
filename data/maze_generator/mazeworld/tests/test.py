@@ -3,8 +3,8 @@
 # File: test.py
 import gym
 import sys
-import l3c.mazeworld
-from l3c.mazeworld import MazeTaskSampler
+import ...mazeworld
+from ...mazeworld import MazeTaskSampler
 from numpy import random
 
 def test_maze(max_steps=1000):
