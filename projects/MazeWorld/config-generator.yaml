@@ -15,6 +15,7 @@ model_config:
   vae_latent_size: 1024
   action_dim: 16
   policy_loss_type: CrossEntropy
+  
   image_encoder_block:
       img_size: 128
       hidden_size: 1024
@@ -27,7 +28,8 @@ model_config:
       n_res_block: 2
 
   decision_block:
-      rsa_type: pota  #potar, otar, oar, oa
+      rsa_type: podaw  #potar, otar, oar, oa
+      is_generate: False
       state_encode:
           input_type: Continuous
           input_size: 1024
@@ -73,7 +75,8 @@ model_config:
           layer_norm: True
           residual_connect: True
           dropout: 0.0
-
+          
+          
       action_diffusion:
           enable: False
           prediction_type: "sample" # epslion / sample /velocity
@@ -100,7 +103,7 @@ model_config:
   
       state_diffusion:
           enable: False
-          prediction_type: "sample" # epslion / sample /velocity
+          prediction_type: "sample" # epslion / sample / velocity
           diffusion_model_name: "latentlm" # latentlm / basic
           basic_model:
             hidden_size: 1024
@@ -136,8 +139,10 @@ model_config:
           use_blockrecurrence: True
           memory_length: 1024
           memory_type: KV
-
+          
+          
       causal_block:
+          is_generate: False
           model_type: GSA # GLA
           num_layers: 18
           hidden_size: 1024
@@ -151,61 +156,25 @@ model_config:
           use_blockrecurrence: True
           checkpoints_density: -1
           memory_type: MEM
-              
-train_config:
-    max_epochs: 20
-    batch_size_vae: 1
-    batch_size_causal: 1
-    epoch_vae_stop: 1
-    epoch_causal_start: -1
-    manual_sync: True
 
-    seq_len_vae: 300
-    seq_len_causal: 1000
-    seg_len_vae: 300
-    seg_len_causal: 1000
 
-    lr_vae: 9.0e-5
-    lr_causal: 2.0e-4
-    lr_vae_decay_interval: 200000
-    lr_causal_decay_interval: 10000
-    lr_vae_start_step: 200000
-    lr_causal_start_step: 10000
 
-    data_path: [PATH]
-    save_model_path: "./checkpoints"
-    max_save_iterations: 3999
+generator_config:
 
-    lossweight_policymodel: 0.01
-    lossweight_worldmodel_raw: 0.90
-    lossweight_worldmodel_latent: 0.09
-    lossweight_l2: 1.0e-6
-
-    use_amp: False
-    use_scaler: False
-
-    sigma_scheduler: 1000
-    sigma_value:
-        - 0.0
-        - 0.01
-        - 0.05
-
-    lambda_scheduler: 1000
-    lambda_value:
-        - 0.0
-        - 1.0e-8
-        - 1.0e-7
-
-test_config:
-    batch_size_vae: 1
-    batch_size_causal: 1
-    data_path: [PATH]
-    epoch_vae_stop: 1
-    epoch_causal_start: -1
-
-    seq_len_vae: 300
-    seq_len_causal: 1000
-    seg_len_vae: 300
-    seg_len_causal: 1000
-
-    output: ./results
+    in_context_len: 5000 # Length of in context learn
+    pred_len: 1 # autoregressive length
+    start_position: 0 # start position
+    end_position: 2000 # end position
+    max_maze: 16
+    model_name: "DecoderColdPM" # "DecoderColdPM" / "DecoderWarmPM"
+    record_interval: 1
+    temp: 0.1 
+    drop_out: 0.2
+    output_root: "path/to/output" # output path
+    data_path: "path/to/maze_data" # maze data path
+    
+    seq_len_causal: 5000
+    max_trails: 1
+    max_total_steps: 5000
+    agent_num: 1
+    epoch_numbers: 1

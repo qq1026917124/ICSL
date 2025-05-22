@@ -46,7 +46,7 @@ class MazeEpochVAE:
                                                     self.config.lambda_value)
         # use customized dataloader
         self.dataloader = PrefetchDataLoader(
-            MazeDataSet(self.config.data_path, self.config.seq_len_vae, verbose=self.main, max_maze=self.max_maze), # TODO
+            MazeDataSet(self.config.data_path, self.config.seq_len_vae, verbose=self.main, max_maze=self.max_maze), 
             batch_size=self.config.batch_size_vae,
             rank=self.rank,
             world_size=self.world_size
@@ -153,9 +153,8 @@ class MazeEpochCausal: # the computer
             self.reduce_dim = 1
             
         else:
-            if not os.path.exists(self.config.output): # TODO 线程冲突
+            if not os.path.exists(self.config.output):
                 os.makedirs(self.config.output)
-
 
             self.logger_keys = ["validate_worldmodel_raw",
                         "validate_worldmodel_latent",
@@ -176,7 +175,7 @@ class MazeEpochCausal: # the computer
     def preprocess(self):
         # use customized dataloader
         self.dataloader = PrefetchDataLoader(
-            MazeDataSet(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze=self.max_maze), # TODO
+            MazeDataSet(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze=self.max_maze), #  
             batch_size=self.config.batch_size_causal,
             rank=self.rank,
             world_size=self.world_size
@@ -202,8 +201,6 @@ class MazeEpochCausal: # the computer
             # Permute (B, T, H, W, C) to (B, T, C, H, W)
             seg_obs = seg_obs.permute(0, 1, 4, 2, 3)
             seg_obs = seg_obs.contiguous()
-            # seg_bev = seg_bev.permute(0, 1, 4, 2, 3)
-            # seg_bev = seg_bev.contiguous()
 
             loss, obs_pred, __, __ = self.model.module.sequential_loss(
                                     prompts = seg_cmd,
@@ -219,8 +216,6 @@ class MazeEpochCausal: # the computer
             
             if self.is_visualize and sub_idx % 20 == 0:
                 current_prediction_observations.append(obs_pred)
-            # self.current_prediction_actions = a_pred
-            # self.current_cache = cache
             losses.append(loss)
             if(self.is_training):
                 syn_loss = (self.config.lossweight_worldmodel_latent * loss["wm-latent"]
@@ -253,27 +248,11 @@ class MazeEpochCausal: # the computer
             loss_wm_l = []
             loss_pm = []
             counts = []
-            # TODO
-            # (B, T, C, H, W)
-            # for loss in losses:
-            #     # for t in range(loss["pm"].shape[1]):
-            #     idx = np.where(loss["count_wm"] != 0)
-            #     if loss["count_pm"] != 0:
-            #         lwmr = loss["wm-raw"] / loss["count_wm"]
-            #         lwml = loss["wm-latent"] / loss["count_wm"]
-            #         lpm = loss["pm"] / loss["count_pm"]
 
             loss_wm_r = torch.cat([loss["wm-raw"] / loss["count_wm"] for loss in losses], dim=1)
             loss_wm_l = torch.cat([loss["wm-latent"] / loss["count_wm"] for loss in losses], dim=1)
-            # print(losses[0]["pm"].shape) 
-            # print(losses[0]["count_pm"].shape)
-            loss_pm = torch.cat([loss["pm"] / loss["count_pm"] for loss in losses], dim=1) # 当mask掉黑屏动作时，count_pm会出现0，导致此处出现NaN
+            loss_pm = torch.cat([loss["pm"] / loss["count_pm"] for loss in losses], dim=1)
             counts = torch.cat([loss["count_pm"] for loss in losses], dim=1)
-
-            # print(f"loss_wm_r: {loss_wm_r.shape}")
-            # print(f"loss_wm_l: {loss_wm_l.shape}")
-            # print(f"loss_pm: {loss_pm.shape}")
-            # print("-----------------------------")
 
             bsz = loss_wm_r.shape[0]
             seg_num = loss_wm_l.shape[1] // self.downsample_length
@@ -283,11 +262,6 @@ class MazeEpochCausal: # the computer
             loss_wm_l = torch.mean(loss_wm_l[:, :valid_seq_len].view(bsz, seg_num, -1), dim=-1)
             loss_pm = torch.mean(loss_pm[:, :valid_seq_len].view(bsz, seg_num, -1), dim=-1)
             counts = torch.mean(counts[:, :valid_seq_len].view(bsz, seg_num, -1), dim=-1)
-            # print(f"loss_wm_r: {loss_wm_r.shape}")
-            # print(f"loss_wm_l: {loss_wm_l.shape}")
-            # print(f"loss_pm: {loss_pm.shape}")
-            # print(f"loss_wm_r: {loss_wm_r}")
-            # print("-----------------------------")
             for i in range(bsz):
                 self.stat.gather(self.device,
                         validate_worldmodel_raw=loss_wm_r[i], 
@@ -378,7 +352,7 @@ class MazeEpochCausalShort: # the computer
             self.reduce_dim = 1
             
         else:
-            if not os.path.exists(self.config.output): # TODO 线程冲突
+            if not os.path.exists(self.config.output): #   线程冲突
                 os.makedirs(self.config.output)
 
 
@@ -401,7 +375,7 @@ class MazeEpochCausalShort: # the computer
     def preprocess(self):
         # use customized dataloader
         self.dataloader = PrefetchDataLoader(
-            MazeDataSetShort(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze=self.max_maze), # TODO
+            MazeDataSetShort(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze=self.max_maze), #  
             batch_size=self.config.batch_size_causal,
             rank=self.rank,
             world_size=self.world_size
@@ -424,11 +398,8 @@ class MazeEpochCausalShort: # the computer
                                 self.config.seq_len_causal, self.config.seg_len_causal, self.device, 
                                 cmd_arr, (obs_arr, 1), behavior_actid_arr, label_actid_arr):
 
-            # Permute (B, T, H, W, C) to (B, T, C, H, W)
             seg_obs = seg_obs.permute(0, 1, 4, 2, 3)
             seg_obs = seg_obs.contiguous()
-            # seg_bev = seg_bev.permute(0, 1, 4, 2, 3)
-            # seg_bev = seg_bev.contiguous()
 
             loss, obs_pred, __, __ = self.model.module.sequential_loss(
                                     prompts = seg_cmd,
@@ -478,27 +449,11 @@ class MazeEpochCausalShort: # the computer
             loss_wm_l = []
             loss_pm = []
             counts = []
-            # TODO
-            # (B, T, C, H, W)
-            # for loss in losses:
-            #     # for t in range(loss["pm"].shape[1]):
-            #     idx = np.where(loss["count_wm"] != 0)
-            #     if loss["count_pm"] != 0:
-            #         lwmr = loss["wm-raw"] / loss["count_wm"]
-            #         lwml = loss["wm-latent"] / loss["count_wm"]
-            #         lpm = loss["pm"] / loss["count_pm"]
 
             loss_wm_r = torch.cat([loss["wm-raw"] / loss["count_wm"] for loss in losses], dim=1)
             loss_wm_l = torch.cat([loss["wm-latent"] / loss["count_wm"] for loss in losses], dim=1)
-            # print(losses[0]["pm"].shape) 
-            # print(losses[0]["count_pm"].shape)
-            loss_pm = torch.cat([loss["pm"] / loss["count_pm"] for loss in losses], dim=1) # 当mask掉黑屏动作时，count_pm会出现0，导致此处出现NaN
+            loss_pm = torch.cat([loss["pm"] / loss["count_pm"] for loss in losses], dim=1) 
             counts = torch.cat([loss["count_pm"] for loss in losses], dim=1)
-
-            # print(f"loss_wm_r: {loss_wm_r.shape}")
-            # print(f"loss_wm_l: {loss_wm_l.shape}")
-            # print(f"loss_pm: {loss_pm.shape}")
-            # print("-----------------------------")
 
             bsz = loss_wm_r.shape[0]
             seg_num = loss_wm_l.shape[1] // self.downsample_length
@@ -508,11 +463,6 @@ class MazeEpochCausalShort: # the computer
             loss_wm_l = torch.mean(loss_wm_l[:, :valid_seq_len].view(bsz, seg_num, -1), dim=-1)
             loss_pm = torch.mean(loss_pm[:, :valid_seq_len].view(bsz, seg_num, -1), dim=-1)
             counts = torch.mean(counts[:, :valid_seq_len].view(bsz, seg_num, -1), dim=-1)
-            # print(f"loss_wm_r: {loss_wm_r.shape}")
-            # print(f"loss_wm_l: {loss_wm_l.shape}")
-            # print(f"loss_pm: {loss_pm.shape}")
-            # print(f"loss_wm_r: {loss_wm_r}")
-            # print("-----------------------------")
             for i in range(bsz):
                 self.stat.gather(self.device,
                         validate_worldmodel_raw=loss_wm_r[i], 
@@ -575,469 +525,10 @@ class MazeEpochCausalShort: # the computer
                             f_model.write(res_text)
 
 
-
-
-
-class MAZEGenerator(GeneratorBase):
-
-    def __call__(self, epoch_id, rank):
-    
-        folder_count = 0
-
-        for folder in os.listdir(self.config.data_root):
-            folder_path = os.path.join(self.config.data_root, folder)
             
-            if os.path.isdir(folder_path):
-                states = np.load(os.path.join(folder_path, 'observations.npy'))
-                actions = np.load(os.path.join(folder_path, 'actions_behavior_id.npy'))
-
-                in_context_len = self.config.in_context_len
-                pred_len = self.config.pred_len
-                start = self.config.start_position
-                temp = self.config.temp
-                drop_out = self.config.drop_out
-                len_causal = self.config.seg_len_causal
-                output_folder = self.config.output
-                
-                end = min(start + in_context_len, len(states))
-
-                pred_obs_list = self.model.module.generate_step_by_step(
-                    observations=states[start:end+1],
-                    actions=actions[start:end],
-                    actions_gt=actions[end:end+pred_len],
-                    temp=temp,
-                    drop_out = drop_out,
-                    device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
-                    in_context_len = in_context_len,
-                    len_causal = len_causal,
-                    n_step=pred_len
-                )
-
-                real = [states[i] for i in range(end+1, end + 1 + pred_len)] 
-
-                pred_obs_list_with_initial = pred_obs_list
-                
-                
-                video_folder = os.path.join(output_folder, f'video_{folder_count}')
-                if not os.path.exists(video_folder):
-                    os.makedirs(video_folder)
-
-                video_filename = os.path.join(video_folder, f"pred_obs_video_{folder_count}.avi")
-                fourcc = cv2.VideoWriter_fourcc(*'XVID') 
-                frame_height, frame_width = pred_obs_list_with_initial[0].shape[:2]
-                video_writer = cv2.VideoWriter(video_filename, fourcc, 10.0, (frame_width * 2, frame_height))
-
-                for real_frame, pred_frame in zip(real, pred_obs_list_with_initial):
-                    rotated_real = cv2.rotate(real_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                    rotated_pred = cv2.rotate(pred_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-
-                    concatenated_img = np.hstack((rotated_real, rotated_pred))
-
-                    img = np.clip(concatenated_img, 0, 255).astype(np.uint8)
-                    video_writer.write(img)
-
-                video_writer.release() 
-
-                print(f"Saved video with {len(real)} frames to {video_filename}")
-
-                
-                updated_cache = None
-                print(f"Cache cleared after generating {len(real)} frames.")
-
-                folder_count += 1  
-
-                if folder_count >= 16:
-                    print("Processed 16 folders. Stopping.")
-                    break 
-
-
-
-
-class compound_error_generator(GeneratorBase): #TODO   
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        for key in kwargs:
-            setattr(self, key, kwargs[key])
-            print(f"{key}: {kwargs[key]}")
-        self.output_root = self.config.output_root
-        self.data_root = self.config.data_path
-        self.pred_len = self.config.pred_len
-        self.in_context_len = self.config.in_context_len
-        self.end_position = self.config.end_position
-        self.start_position = self.config.start_position
-        self.record_interval = self.config.record_interval
-        self.record_points = np.array([1, 10, 100, 1000, 2000, 9000])
-        # [i for i in range(self.start_position, self.end_position, self.record_interval)]
-        
-        if (self.config.has_attr("max_maze")):
-            self.max_maze = self.config.max_maze
-        else:
-            self.max_maze = None
-
-        if self.end_position > self.config.seq_len_causal:
-            assert False, "end_position should be smaller than seq_len_causal"
-        
-        self.logger_keys = ["validate_worldmodel_raw"]
-        self.stat = DistStatistics(*self.logger_keys)
-        if(self.config.has_attr("downsample_length")):
-            self.downsample_length = self.config.downsample_length
-        else:
-            self.downsample_length = 10
-
-    def preprocess(self):
-        self.K_step_list = [1, 2, 4, 8]
-        if self.output_root is not None:
-            if not os.path.exists(self.output_root):
-                os.makedirs(self.output_root)
-                print(f"Created output folder {self.output_root}")
-        else:
-            assert False, "output_root is required for general_generator"
-        self.dataloader = PrefetchDataLoader(
-            MazeDataSet(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze = self.max_maze, folder_verbose=True),
-            batch_size=1, # TODO 
-            rank=self.rank,
-            world_size=self.world_size
-            )
-        print(f"Preprocessed dataloader with {len(self.dataloader)} batches")
-    def __call__(self, epoch_id, rank):
-        import cv2
-        # nohup python -m projects.MazeWorld.generator_test ./generator-configs/blockTest.yaml > static_cache.log 2>&1 &
-        batch_size = 1 # TODO
-        pred_len = self.pred_len
-        loss_batch = []
-        cache_generate = False
-        o_generate = False
-        video_generate = True
-        # history_cache = None
-        K_step_list = self.K_step_list
-        for batch_id, (batch_data, folder_name) in enumerate(self.dataloader):
-            folder_name = folder_name[0] # batch size is 1
-            if len(folder_name.split("/")) > 1: # to deal with the trajectory folder...
-                parent_folder = folder_name.split("/")[0]
-                sub_name = folder_name.split("/")[1]
-                if not os.path.exists(os.path.join(self.output_root, parent_folder)):
-                    os.makedirs(os.path.join(self.output_root, parent_folder))
-
-            print(f"batch_id: {batch_id} processing {folder_name} with {len(batch_data)} data of shape")
-
-            output_folder_path = os.path.join(self.output_root, folder_name)
-            if not os.path.exists(output_folder_path):
-                os.makedirs(output_folder_path)
-            cmd_arr, obs_arr, behavior_actid_arr, label_actid_arr, behavior_act_arr, label_act_arr, rew_arr = batch_data
-            obs_arr = obs_arr.permute(0, 1, 4, 2, 3) # (B, T, H, W, C) to (B, T, C, H, W)
-            states = obs_arr.contiguous()
-            commands = cmd_arr.contiguous()
-            actions = behavior_actid_arr.contiguous()
-
-            print(f"batch_id: {batch_id} processing {folder_name} with {len(batch_data)} data of shape of {states.shape}")
-            assert states.shape[1] == actions.shape[1] + 1, f"states shape: {states.shape}, actions shape: {actions.shape}"
-            history_cache = None
-            self.model.module.reset()
-            loss_records = []
-            pred_records = []
-            real_records = []
-            for checkpoint_id in range(0, self.end_position):
-                end = min(checkpoint_id, states.shape[1] - 1)
-                if end in self.record_points:
-                    last_history_cache = history_cache.copy()
-                    for pred_len in K_step_list:
-                        history_cache = last_history_cache
-                        pred_obs_list, history_cache = self.model.module.generate_states_only(
-                                prompts=commands[:, end:end+pred_len],
-                                current_observation=states[:, end:end+1], 
-                                action_trajectory=actions[:, end:end+pred_len],
-                                history_observation=None, #states[start:end],
-                                history_action=None, #actions[start:end],
-                                history_update_memory=False, 
-                                autoregression_update_memory=False, # TOTEST
-                                cache=history_cache,
-                                single_batch=True,
-                                history_single_step=False,
-                                future_single_step=False,
-                                raw_images=True,
-                                need_numpy=False
-                                )
-                        real = states[:, end+1:end+1+pred_len]
-                        mse_loss, cnt = weighted_loss(pred_obs_list.cpu(), 
-                                                loss_type="mse",
-                                                gt=real, 
-                                                need_cnt=True,
-                                                )
-                        mse_loss = mse_loss/255/255
-                        print(f"check_point {checkpoint_id} with mse_loss: {mse_loss/cnt}, cnt: {cnt}")
-                        loss_records.append(mse_loss.detach().numpy()/cnt)  
-                        K_folder = os.path.join(output_folder_path, f"K_{pred_len}")
-                        if not os.path.exists(K_folder):
-                            os.makedirs(K_folder)
-                        np.save(os.path.join(K_folder, f"loss_{checkpoint_id}.npy"), mse_loss.detach().numpy()/cnt)
-                        print(f"Saved loss to {os.path.join(K_folder, f'loss_{checkpoint_id}.npy')}")
-                        np.save(os.path.join(K_folder, f"pred_{checkpoint_id}.npy"), pred_obs_list.cpu().detach().numpy())
-                        np.save(os.path.join(K_folder, f"real_{checkpoint_id}.npy"), real.cpu().detach().numpy())
-                        print(f"Saved pred and real to {os.path.join(K_folder, f'pred_{checkpoint_id}.npy')} and {os.path.join(K_folder, f'real_{checkpoint_id}.npy')}")
-
-                else:
-                    pred_len = 1
-                    pred_obs_list, history_cache = self.model.module.generate_states_only(
-                            prompts=commands[:, end:end+pred_len],
-                            current_observation=states[:, end:end+1], 
-                            action_trajectory=actions[:, end:end+pred_len],
-                            history_observation=None, #states[start:end],
-                            history_action=None, #actions[start:end],
-                            history_update_memory=False, 
-                            autoregression_update_memory=False, # TOTEST
-                            cache=history_cache,
-                            single_batch=True,
-                            history_single_step=False,
-                            future_single_step=False,
-                            raw_images=True,
-                            need_numpy=False
-                            )
-
-
-    def epoch_end(self, epoch_id):
-        pass
-            
-
-class MPinteractive_trajectory(GeneratorBase):
-
-    def epoch_end(self, epoch_id):
-        # MazeTaskDataSet
-        pass
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        for key in kwargs:
-            setattr(self, key, kwargs[key])
-            print(f"{key}: {kwargs[key]}")
-        self.output_root = self.config.output_root
-        self.in_context_len = self.config.in_context_len
-        self.end_position = self.config.end_position
-        self.start_position = self.config.start_position
-        self.record_interval = self.config.record_interval
-        self.record_points = [i for i in range(self.start_position, self.end_position, self.record_interval)]
-        if self.config.has_attr("max_maze"):
-            self.max_maze = self.config.max_maze
-        else:
-            self.max_maze = None
-        # if self.output_root is not None:
-        #     if not os.path.exists(self.output_root):
-        #         os.makedirs(self.output_root)
-        #         print(f"Created output folder {self.output_root}")
-        # if self.output_root is None:
-        #     assert False, "output_root is required for general_generator"
-        if self.end_position > self.config.seq_len_causal:
-            assert False, "end_position should be smaller than seq_len_causal"
-        
-
-
-    def preprocess(self):
-        self.dataloader = PrefetchDataLoader(
-            MazeTaskDataSet(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze = self.max_maze, folder_verbose=True),
-            batch_size=1, # TODO 
-            rank=self.rank,
-            world_size=self.world_size
-            )
-        if self.output_root is not None:
-            if not os.path.exists(self.output_root):
-                os.makedirs(self.output_root)
-                print(f"Created output root {self.output_root}")
-            if self.config.data_path[-1] == "/":
-                output_folder_path = os.path.join(self.output_root, self.config.data_path.split("/")[-2])
-            else:
-                output_folder_path = os.path.join(self.output_root, self.config.data_path.split("/")[-1])
-            print(f"output folder path: {output_folder_path}")
-            if not os.path.exists(output_folder_path):
-                os.makedirs(output_folder_path)
-                print(f"Created output folder {output_folder_path}")
-            self.output_folder_path = output_folder_path
-        print(f"Preprocessed dataloader with {len(self.dataloader)} batches")
-
-    def __call__(self, epoch_id, rank):
-        import gym
-        import pickle
-        import cv2
-        import maze_generator.mazeworld
-        from maze_generator.mazeworld import MazeTaskSampler, Resampler, MazeStaticSampler
-        from maze_generator.mazeworld.agents import OracleAgent
-        for batch_id, (batch_data, folder_name) in enumerate(self.dataloader):
-            max_steps = 10000
-            n_range = (15,16)
-            maze_env = gym.make("mazeworld-v2", enable_render=False, max_steps=max_steps, resolution=(128, 128))
-            
-            # origin_task = MazeTaskSampler(n_range=n_range, allow_loops=True, 
-            #             landmarks_number_range=(6, 10),
-            #             commands_sequence = 10000,
-            #             verbose=False)
-            # new_task = Resampler(origin_task)
-            folder_name = folder_name[0] # batch size is 1
-            new_task_path = batch_data[0]
-            new_task = pickle.load(open(new_task_path, 'rb'))
-
-            print(f"task: {new_task}")
-            print("-----------------------------\n\n")  
-            maze_env.set_task(new_task)
-
-            done = False
-            observation_list = []
-            reward_list = []
-            bev_list = []
-            cmd_list = []
-            sum_reward = 0
-            
-            observation, information = maze_env.reset()
-            observation = np.array(observation, dtype=np.uint8)
-            # (H, W, C) to (C, H, W)
-            observation = np.transpose(observation, (2, 0, 1))
-            command = information["command"]
-            command = np.repeat(command, 256, axis=0)
-            last_observation = None # observation
-            last_action = None # np.zeros_like(maze_env.action_space.sample())
-            inference_record = []
-            action_record = []
-            loss_record = []
-            output_root = self.output_folder_path
-            maze_output_folder = os.path.join(output_root, folder_name)
-            if not os.path.exists(maze_output_folder):
-                os.makedirs(maze_output_folder)
-            output_folder = os.path.join(maze_output_folder, self.config.model_name)
-            if not os.path.exists(output_folder):
-                os.makedirs(output_folder)
-            print(f"output folder: {output_folder}")
-            print("-----------------------------")
-            import tqdm
-            K_step = 1
-            cache = None
-            self.model.module.reset()
-            for step in range(max_steps):
-                if done:
-                    print(f"done at step {step}")
-                    break
-                cmd_string = information["command"]
-                # action = self.model.module.step(observation, last_observation, last_action) # Replace it with your own policy function
-                pred_obs_list, action, cache = self.model.module.generate_states_and_action(
-                                command,
-                                observation, 
-                                future_steps=K_step,
-                                history_observation=None, #last_observation,
-                                history_action=None, #last_action,
-                                history_update_memory=True, 
-                                autoregression_update_memory=True,
-                                cache=cache,
-                                single_batch=True,
-                                history_single_step=True,
-                                raw_images=True,
-                                need_predict_states=True,
-                                need_numpy=True)
-                action = action[0,0]
-                inference_record.append(pred_obs_list)
-                action_record.append(action)
-                # print(f"action: {action}")
-                # print(f"action: {np.info(action)}")
-                # print("-----------------------------")  
-                obs, reward, done, information = maze_env.step(action)
-                command = information["command"]
-                command = np.repeat(command, 256, axis=0)
-                # print(f"maze_task: {maze_env.maze_core._instant_rewards}")
-                maze_env.render()
-                obs = np.array(obs, dtype=np.uint8)
-                obs = np.transpose(obs, (2, 0, 1))
-                observation_list.append(obs)
-                mse_loss = np.mean((obs - pred_obs_list[0])**2/(255*255))
-                loss_record.append(mse_loss)
-                # print(f"mse loss: {mse_loss}")
-                last_observation = observation
-                last_action = action
-                observation = obs
-                reward_list.append(reward)
-                bev_list.append(maze_env.get_local_map()[1])
-                cmd_list.append(information["command"])
-                sum_reward += reward
-
-            inference_record = np.array(inference_record)
-            observation_list = np.array(observation_list)
-            reward_list = np.array(reward_list)
-            # save reward record to npy
-            np.save(os.path.join(output_folder, "reward.npy"), reward_list)
-            print(f"Saved reward to {os.path.join(output_folder, 'reward.npy')}")
-            print("------------------------------")
-            print(f"sum reward: {sum_reward}")
-            print("------------------------------")
-            import matplotlib.pyplot as plt
-            # plt.plot(loss_record, label="mse loss", alpha=0.5)
-            mean_loss_record = []
-            downsample_length = 50
-            loss_record = np.array(loss_record)
-            # save loss to npy
-            np.save(os.path.join(output_folder, "loss.npy"), loss_record)
-            print(f"Saved loss to {os.path.join(output_folder, 'loss.npy')}")
-            for i in range(0, len(loss_record)):
-                mean_loss_record.append(np.mean(loss_record[max(i - downsample_length, 0):min(i + downsample_length, len(loss_record))]))
-            plt.plot(range(0, len(loss_record)), mean_loss_record, label="mse loss")
-            plt.legend()
-            plt.savefig(os.path.join(output_folder, "mse_loss.png"))
-            plt.close()
-            print(f"Saved mse loss plot to {os.path.join(output_folder, 'mse_loss.png')}")
-            maze_env.save_trajectory(os.path.join(output_folder, "trajectory.png"))
-            print(f"Saved trajectory to {os.path.join(output_folder, 'trajectory.png')}")
-            maze_env.save_trajectory_npy(os.path.join(output_folder, f"trajectory.npy"))
-            pickle.dump(new_task, open(os.path.join(output_folder, "task.pkl"), "wb"))
-            
-            video_folder = os.path.join(output_folder, f'video')
-            if not os.path.exists(video_folder):
-                os.makedirs(video_folder)
-            video_filename = os.path.join(video_folder, f"pred_obs_video{0}.avi")
-            fourcc = cv2.VideoWriter_fourcc(*'XVID') 
-            frame_height, frame_width = inference_record[0].shape[-2:]
-            video_writer = cv2.VideoWriter(video_filename, fourcc, 10.0, (frame_width * 2, frame_height))
-            frame_count = 0
-            T = 1
-            for real_frames, pred_frames in zip(observation_list, inference_record):
-                # (B, T, C, H, W) to (H, W, C) just pick up the first frame of T, and we default B=1
-                real_frame = real_frames.transpose(1, 2, 0)
-                pred_frame = pred_frames[0, 0].transpose(1, 2, 0)
-                rotated_real = cv2.rotate(real_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                rotated_pred = cv2.rotate(pred_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-
-                concatenated_img = np.hstack((rotated_real, rotated_pred))
-                # save the concatenated image
-
-                img = np.clip(concatenated_img, 0, 255).astype(np.uint8)
-                if frame_count % 100 == 0:
-                    cv2.imwrite(os.path.join(video_folder, f"frame_{frame_count}.png"), img)
-                    if T > 1:
-                        ARimageFolder = os.path.join(video_folder, f"ARimage_{frame_count}")
-                        if not os.path.exists(ARimageFolder):
-                            os.makedirs(ARimageFolder)
-                        whole_ARimage = None
-                        for i in range(T):
-                            ARimage = pred_frames[0,i].transpose(1, 2, 0)
-                            rotated_ARimage = cv2.rotate(ARimage, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                            ARimage = np.clip(rotated_ARimage, 0, 255).astype(np.uint8)
-                            ARreal = real_frames[0,i].transpose(1, 2, 0)
-                            rotated_ARreal = cv2.rotate(ARreal, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                            ARimage = np.clip(rotated_ARreal, 0, 255).astype(np.uint8)
-                            # concatenate the ARimage and ARreal up and down
-                            ARconcatenated_img = np.vstack((rotated_ARreal, rotated_ARimage))
-                            if i == 0:
-                                whole_ARimage = ARconcatenated_img
-                            else:
-                                whole_ARimage = np.hstack((whole_ARimage, ARconcatenated_img))
-                            ARimage = np.clip(ARconcatenated_img, 0, 255).astype(np.uint8)
-                            cv2.imwrite(os.path.join(ARimageFolder, f"ARframe_{i}.png"), ARimage)
-                        cv2.imwrite(os.path.join(ARimageFolder, f"whole_ARimage.png"), whole_ARimage)
-                        
-                    cv2.imwrite(os.path.join(video_folder, f"frame_{frame_count}.png"), img)
-                frame_count += 1
-                video_writer.write(img)
-            video_writer.release() 
-            print(f"Saved video with {len(observation_list)} frames to {video_filename}")
-
-
 
 
 class interactive_trajectory(GeneratorBase):
-
     def epoch_end(self, epoch_id):
         # MazeTaskDataSet
         pass
@@ -1057,12 +548,6 @@ class interactive_trajectory(GeneratorBase):
             self.max_maze = self.config.max_maze
         else:
             self.max_maze = None
-        # if self.output_root is not None:
-        #     if not os.path.exists(self.output_root):
-        #         os.makedirs(self.output_root)
-        #         print(f"Created output folder {self.output_root}")
-        # if self.output_root is None:
-        #     assert False, "output_root is required for general_generator"
         if self.end_position > self.config.seq_len_causal:
             assert False, "end_position should be smaller than seq_len_causal"
         
@@ -1071,7 +556,7 @@ class interactive_trajectory(GeneratorBase):
     def preprocess(self):
         self.dataloader = PrefetchDataLoader(
             MazeTaskDataSet(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze = self.max_maze, folder_verbose=True),
-            batch_size=1, # TODO 
+            batch_size=1, #   
             rank=self.rank,
             world_size=self.world_size
             )
@@ -1101,12 +586,7 @@ class interactive_trajectory(GeneratorBase):
             max_steps = 10000
             n_range = (15,16)
             maze_env = gym.make("mazeworld-v2", enable_render=False, max_steps=max_steps, resolution=(128, 128))
-            
-            # origin_task = MazeTaskSampler(n_range=n_range, allow_loops=True, 
-            #             landmarks_number_range=(6, 10),
-            #             commands_sequence = 10000,
-            #             verbose=False)
-            # new_task = Resampler(origin_task)
+        
             folder_name = folder_name[0] # batch size is 1
             new_task_path = batch_data[0]
             new_task = pickle.load(open(new_task_path, 'rb'))
@@ -1128,8 +608,8 @@ class interactive_trajectory(GeneratorBase):
             observation = np.transpose(observation, (2, 0, 1))
             command = information["command"]
             command = np.repeat(command, 256, axis=0)
-            last_observation = None # observation
-            last_action = None # np.zeros_like(maze_env.action_space.sample())
+            last_observation = None 
+            last_action = None 
             inference_record = []
             action_record = []
             loss_record = []
@@ -1151,13 +631,12 @@ class interactive_trajectory(GeneratorBase):
                     print(f"done at step {step}")
                     break
                 cmd_string = information["command"]
-                # action = self.model.module.step(observation, last_observation, last_action) # Replace it with your own policy function
                 pred_obs_list, action, cache = self.model.module.generate_states_and_action(
                                 command,
                                 observation, 
                                 future_steps=K_step,
-                                history_observation=None, #last_observation,
-                                history_action=None, #last_action,
+                                history_observation=None,
+                                history_action=None, 
                                 history_update_memory=True, 
                                 autoregression_update_memory=True,
                                 cache=cache,
@@ -1169,20 +648,15 @@ class interactive_trajectory(GeneratorBase):
                 action = action[0,0]
                 inference_record.append(pred_obs_list)
                 action_record.append(action)
-                # print(f"action: {action}")
-                # print(f"action: {np.info(action)}")
-                # print("-----------------------------")  
                 obs, reward, done, information = maze_env.step(action)
                 command = information["command"]
                 command = np.repeat(command, 256, axis=0)
-                # print(f"maze_task: {maze_env.maze_core._instant_rewards}")
                 maze_env.render()
                 obs = np.array(obs, dtype=np.uint8)
                 obs = np.transpose(obs, (2, 0, 1))
                 observation_list.append(obs)
                 mse_loss = np.mean((obs - pred_obs_list[0])**2/(255*255))
                 loss_record.append(mse_loss)
-                # print(f"mse loss: {mse_loss}")
                 last_observation = observation
                 last_action = action
                 observation = obs
@@ -1201,7 +675,6 @@ class interactive_trajectory(GeneratorBase):
             print(f"sum reward: {sum_reward}")
             print("------------------------------")
             import matplotlib.pyplot as plt
-            # plt.plot(loss_record, label="mse loss", alpha=0.5)
             mean_loss_record = []
             downsample_length = 50
             loss_record = np.array(loss_record)
@@ -1238,7 +711,6 @@ class interactive_trajectory(GeneratorBase):
 
                 concatenated_img = np.hstack((rotated_real, rotated_pred))
                 # save the concatenated image
-
                 img = np.clip(concatenated_img, 0, 255).astype(np.uint8)
                 if frame_count % 100 == 0:
                     cv2.imwrite(os.path.join(video_folder, f"frame_{frame_count}.png"), img)
@@ -1409,15 +881,14 @@ class prediction_coding_generator(GeneratorBase):
     def preprocess(self):
         self.dataloader = PrefetchDataLoader(
             MazeDataSet(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze = self.max_maze, folder_verbose=True),
-            batch_size=1, # TODO 
+            batch_size=1, #   
             rank=self.rank,
             world_size=self.world_size
             )
         print(f"Preprocessed dataloader with {len(self.dataloader)} batches")
     def __call__(self, epoch_id, rank):
         import cv2
-        # nohup python -m projects.MazeWorld.generator_test ./generator-configs/blockTest.yaml > static_cache.log 2>&1 &
-        batch_size = 1 # TODO
+        batch_size = 1 #  
         pred_len = self.pred_len
         for batch_id, (batch_data, folder_name) in enumerate(self.dataloader):
             folder_name = folder_name[0] # batch size is 1
@@ -1460,7 +931,7 @@ class prediction_coding_generator(GeneratorBase):
                 map_loss_record = []
                 
                 for check_point in mask_points: # the check point will be masked by the prediction of check_point - 1
-                    history_cache = None # TODO
+                    history_cache = None #  
                     history_before_cache = None
                     last_cache = None
                     start_point = check_point - in_context_len
@@ -1477,10 +948,10 @@ class prediction_coding_generator(GeneratorBase):
                                 prompts=commands[:, end:end+pred_len],
                                 current_observation=states[:, end:end+1], 
                                 action_trajectory=actions[:, end:end+pred_len],
-                                history_observation=None, #states[start:end],
-                                history_action=None, #actions[start:end],
+                                history_observation=None,
+                                history_action=None, 
                                 history_update_memory=False, 
-                                autoregression_update_memory=False, # TOTEST
+                                autoregression_update_memory=False, 
                                 cache=history_cache,
                                 single_batch=True,
                                 history_single_step=False,
@@ -1523,10 +994,10 @@ class prediction_coding_generator(GeneratorBase):
                                 prompts=commands[:, end:end+pred_len],
                                 current_observation=state_copy[:, end:end+1], 
                                 action_trajectory=actions[:, end:end+pred_len],
-                                history_observation=None, #states[start:end],
-                                history_action=None, #actions[start:end],
+                                history_observation=None, 
+                                history_action=None, 
                                 history_update_memory=False, 
-                                autoregression_update_memory=False, # TOTEST
+                                autoregression_update_memory=False, 
                                 cache=history_cache,
                                 single_batch=True,
                                 history_single_step=False,
@@ -1547,7 +1018,6 @@ class prediction_coding_generator(GeneratorBase):
                     print(f"masked_loss_sum: {masked_loss_sum}, effect_loss_sum: {effect_loss_sum}")
                     relative_loss_diff = (masked_loss_sum - effect_loss_sum) / effect_loss_sum
                     relative_loss_diff = relative_loss_diff.detach().cpu().numpy()
-                    # loss_record_context[check_point] = (masked_loss_sum, effect_loss_sum, relative_loss_diff)
                     data_pair = (loss_record[check_point - 1], relative_loss_diff)
                     np.save(os.path.join(output_folder_pred, f"point_{check_point}.npy"), data_pair)
                     print(f"Saved point to {os.path.join(output_folder_pred, f'point_{check_point}.npy')}")
@@ -1555,157 +1025,9 @@ class prediction_coding_generator(GeneratorBase):
 
     def epoch_end(self, epoch_id):
         pass
-        # stat_res = self.stat()
-        # if not hasattr(self, 'logger'):
-        #     self.logger = None
-        # if(self.logger is not None):
-        #     self.logger(stat_res["validate_worldmodel_raw"]["mean"],
-        #             epoch=epoch_id)
 
 
-
-class fixed_context_generator(GeneratorBase):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        for key in kwargs:
-            setattr(self, key, kwargs[key])
-            print(f"{key}: {kwargs[key]}")
-        self.output_root = self.config.output_root
-        self.data_root = self.config.data_path
-        self.pred_len = self.config.pred_len
-        self.in_context_len = self.config.in_context_len
-        self.end_position = self.config.end_position
-        self.start_position = self.config.start_position
-        self.record_interval = self.config.record_interval
-        self.record_points = [i for i in range(self.start_position, self.end_position, self.record_interval)]
-        if self.config.has_attr("max_maze"):
-            self.max_maze = self.config.max_maze
-        else:
-            self.max_maze = None
-        # self.K_step = self.config.K_step
-        if self.output_root is not None:
-            if not os.path.exists(self.output_root):
-                os.makedirs(self.output_root)
-                print(f"Created output folder {self.output_root}")
-        else:
-            assert False, "output_root is required for general_generator"
-        if self.end_position > self.config.seq_len_causal:
-            assert False, "end_position should be smaller than seq_len_causal"
-
-
-    def preprocess(self):
-        self.dataloader = PrefetchDataLoader(
-            MazeDataSet(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze = self.max_maze, folder_verbose=True),
-            batch_size=1, # TODO 
-            rank=self.rank,
-            world_size=self.world_size
-            )
-        print(f"Preprocessed dataloader with {len(self.dataloader)} batches")
-    def __call__(self, epoch_id, rank):
-        import cv2
-        # nohup python -m projects.MazeWorld.generator_test ./generator-configs/blockTest.yaml > static_cache.log 2>&1 &
-        batch_size = 1 # TODO
-        pred_len = self.pred_len
-        for batch_id, (batch_data, folder_name) in enumerate(self.dataloader):
-            folder_name = folder_name[0] # batch size is 1
-            if len(folder_name.split("/")) > 1:
-                parent_folder = folder_name.split("/")[0]
-                sub_name = folder_name.split("/")[1]
-                if not os.path.exists(os.path.join(self.output_root, parent_folder)):
-                    os.makedirs(os.path.join(self.output_root, parent_folder))
-
-            print(f"batch_id: {batch_id} processing {folder_name} with {len(batch_data)} data of shape ")
-            output_folder_path = os.path.join(self.output_root, folder_name)
-            if not os.path.exists(output_folder_path):
-                os.makedirs(output_folder_path)
-
-            cmd_arr, obs_arr, behavior_actid_arr, label_actid_arr, behavior_act_arr, label_act_arr, rew_arr = batch_data
-            obs_arr = obs_arr.permute(0, 1, 4, 2, 3) # (B, T, H, W, C) to (B, T, C, H, W)
-            states = obs_arr.contiguous()
-            commands = cmd_arr.contiguous()
-            actions = behavior_actid_arr.contiguous()
-
-            print(f"batch_id: {batch_id} processing {folder_name} with {len(batch_data)} data of shape of {states.shape}")
-            assert states.shape[1] == actions.shape[1] + 1, f"states shape: {states.shape}, actions shape: {actions.shape}"
-            history_cache = None
-            if not isinstance(self.in_context_len, list):
-                self.in_context_len = [self.in_context_len]
-            for in_context_len in [5, 100]:
-                loss_records = []
-                pred_records = []
-                real_records = []
-                pred_len = 1
-                print(f"pred_len: {pred_len}")
-                print(f"in_context_len: {in_context_len}")
-
-                output_folder_pred = os.path.join(output_folder_path, f"context_{in_context_len}")
-                if not os.path.exists(output_folder_pred):
-                    os.makedirs(output_folder_pred)
-                
-                map_loss_record = []
-                
-                for check_point in self.record_points: # the check point will be masked by the prediction of check_point - 1
-                    history_cache = None # TODO
-                    start_point = max(check_point - in_context_len, 0)
-                    end_point = min(check_point + 1, states.shape[1] - 1)
-                    loss_record = []
-                    inference_record = {}
-                    pred_len = 1
-                    print(f"check_point: {check_point}, start_point: {start_point}, end_point: {end_point}")
-                    for i in range(start_point, end_point):
-                        # if i == check_point - 1:
-                        #     pred_len = self.K_step # To change the K when predicting the check point
-                        end = min(i, states.shape[1] - 1)
-                        pred_obs_list, history_cache = self.model.module.generate_states_only(
-                                prompts=commands[:, end:end+pred_len],
-                                current_observation=states[:, end:end+1], 
-                                action_trajectory=actions[:, end:end+pred_len],
-                                history_observation=None, #states[start:end],
-                                history_action=None, #actions[start:end],
-                                history_update_memory=False, 
-                                autoregression_update_memory=False, # TOTEST
-                                cache=history_cache,
-                                single_batch=True,
-                                history_single_step=False,
-                                future_single_step=False,
-                                raw_images=True,
-                                need_numpy=False)
-                        real = states[:, end+1:end+1+pred_len]
-                        print(f"check_point {i} with pred_obs_list shape: {pred_obs_list.shape}")
-                        print(f"sum of real: {torch.sum(real)}")
-                        mse_loss, cnt = weighted_loss(pred_obs_list.cpu(), 
-                                                loss_type="mse",
-                                                gt=real, 
-                                                need_cnt=True,
-                                                )
-                        mse_loss = mse_loss/255/255
-                        if i == check_point:
-                            pred_records.append(pred_obs_list[0].cpu().detach().numpy())
-                            real_records.append(real.cpu().detach().numpy())
-                            loss_records.append(mse_loss.cpu().detach().numpy())
-                            print(f"check_point {check_point} with mse_loss: {loss_records[-1]})")
-
-                    
-                    np.save(os.path.join(output_folder_pred, f"loss_{check_point}.npy"), loss_records[-1])
-                    print(f"Saved point to {os.path.join(output_folder_pred, f'loss_{check_point}.npy')}")
-                    np.save(os.path.join(output_folder_pred, f"pred_{check_point}.npy"), pred_records[-1])
-                    print(f"Saved point to {os.path.join(output_folder_pred, f'pred_{check_point}.npy')}")
-                    np.save(os.path.join(output_folder_pred, f"real_{check_point}.npy"), real_records[-1])
-                    print(f"Saved point to {os.path.join(output_folder_pred, f'real_{check_point}.npy')}")
-
-                    
-
-    def epoch_end(self, epoch_id):
-        stat_res = self.stat()
-        if not hasattr(self, 'logger'):
-            self.logger = None
-        if(self.logger is not None):
-            self.logger(stat_res["validate_worldmodel_raw"]["mean"],
-                    epoch=epoch_id)
-
-
-
-class general_generator(GeneratorBase): #TODO   
+class general_generator(GeneratorBase): 
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -1721,11 +1043,6 @@ class general_generator(GeneratorBase): #TODO
         self.record_interval = self.config.record_interval
         self.record_points = [i for i in range(self.start_position, self.end_position, self.record_interval)]
         
-        # self.start_points = [i for i in range(0, 9000, 2000)]
-        # self.record_points = []
-        # for s in self.start_points:
-        #     for i in range(s, s+1800):
-        #         self.record_points.append(i)
         print(f"record points: {self.record_points}")
         if self.config.has_attr("max_maze"):
             self.max_maze = self.config.max_maze
@@ -1751,7 +1068,7 @@ class general_generator(GeneratorBase): #TODO
     def preprocess(self):
         self.dataloader = PrefetchDataLoader(
             MazeDataSet(self.config.data_path, self.config.seq_len_causal, verbose=self.main, max_maze = self.max_maze, folder_verbose=True),
-            batch_size=1, # TODO 
+            batch_size=1,
             rank=self.rank,
             world_size=self.world_size
             )
@@ -1761,7 +1078,6 @@ class general_generator(GeneratorBase): #TODO
         if not hasattr(self, 'logger'):
             self.logger = None
         if(self.logger is None):
-            # self.logger_keys = self.get('logger_keys')
             if(self.logger_keys is not None and len(self.logger_keys)!=0):
                 assert type(self.logger_keys) == list, \
                     f"The logger_keys must be a list of string."
@@ -1779,14 +1095,12 @@ class general_generator(GeneratorBase): #TODO
 
     def __call__(self, epoch_id, rank):
         import cv2
-        # nohup python -m projects.MazeWorld.generator_test ./generator-configs/blockTest.yaml > static_cache.log 2>&1 &
-        batch_size = 1 # TODO
+        batch_size = 1 
         pred_len = self.pred_len
         loss_batch = []
         cache_generate = True
         o_generate = False
         video_generate = False
-        # history_cache = None
         for batch_id, (batch_data, folder_name) in enumerate(self.dataloader):
             folder_name = folder_name[0] # batch size is 1
             if len(folder_name.split("/")) > 1:
@@ -1812,13 +1126,7 @@ class general_generator(GeneratorBase): #TODO
             loss_records = []
             pred_records = []
             real_records = []
-            # last_real = states[:, 0:1].clone().cpu().detach().numpy()
             for checkpoint_id in range(0, self.end_position):
-                # if checkpoint_id in self.start_points:
-                #     print(f"checkpoint_id: {checkpoint_id} start_points")
-                #     history_cache = None
-                #     self.model.module.reset()
-                
                 end = min(checkpoint_id, states.shape[1] - 1)
                 pred_obs_list, history_cache = self.model.module.generate_states_only(
                         prompts=commands[:, end:end+pred_len],
