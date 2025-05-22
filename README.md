@@ -84,7 +84,7 @@ Specify the log path and whether to use tensorboard.
 Configuration for the overall model architecture and components, including encoders, decoders, and causal blocks. It defines the structure and behavior of the model during training and inference.
 
 - **max_position_loss_weighting**: Defines the maximum sequence length that the model can handle.
-- **context_warmup**: specify a increasing loss weighting with the context length, as shown in Appendices of [EPRNN](https://arxiv.org/pdf/2109.03554).
+- **context_warmup**: specify a increasing loss weighting with the context length.
 - **causal_block**:  Options include `Transformer`, `GSA`, `GLA`, `MAMBA`, `RWKV6`, `RWKV7`. The code automatically use causal masks for `Transformer`, and employ a chunk-wise forward and backward pass. E.g., `Transformer` is automatically set to sliding window attention mode by setting train_config.seg_len.
 - **state_encode**, **state_decode**, **action_encode**, ...: specify the encoder and decoder for states, actions, rewards etc.
 
