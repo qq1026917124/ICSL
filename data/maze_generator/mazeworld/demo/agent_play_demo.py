@@ -5,6 +5,11 @@ import time
 import ...mazeworld
 from ...mazeworld import MazeTaskSampler
 from ...mazeworld.agents import SmartSLAMAgent, OracleAgent
+from ...mazeworld.envs.dynamics import PI, DEFAULT_ACTION_SPACE_16, DEFAULT_ACTION_SPACE_32
+from ...mazeworld.envs.maze_env import MazeWorldContinuous3D
+
+
+
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Playing the maze world demo with your keyboard')

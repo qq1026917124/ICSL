@@ -2,8 +2,8 @@ import argparse
 import pickle
 import random
 import .mazeworld
-from .mazeworld import MazeTaskSampler, Resampler
-from .mazeworld.agents import SmartSLAMAgent
+from maze_generator.mazeworld import MazeTaskSampler, Resampler
+from maze_generator.mazeworld.agents import SmartSLAMAgent
 
 
 if __name__=="__main__":

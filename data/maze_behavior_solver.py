@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # coding=utf8
-# File: dump_maze.py
-import gym
-import sys
 import os
 import time
 import numpy
@@ -11,8 +8,9 @@ import multiprocessing
 import pickle
 import random as rnd
 from numpy import random
-from .mazeworld.agents import SmartSLAMAgent
+from maze_generator.mazeworld.agents import SmartSLAMAgent
 
+    
     
 class MazeNoisyExpertAgent(SmartSLAMAgent):
     def __init__(self, 

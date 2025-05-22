@@ -4,10 +4,10 @@ import pygame
 from .agent_base import AgentBase
 from queue import Queue
 from pygame import font
-from ...envs.dynamics import PI
-from ...envs.utils import conv2d_numpy
-from ...envs.dynamics import search_optimal_action
-from ...envs.ray_caster_utils import landmarks_color, landmarks_rgb, landmarks_rgb_arr, paint_agent_arrow
+from ...mazeworld.envs.dynamics import PI
+from ...mazeworld.envs.utils import conv2d_numpy
+from ...mazeworld.envs.dynamics import search_optimal_action
+from ...mazeworld.envs.ray_caster_utils import landmarks_color, landmarks_rgb, landmarks_rgb_arr, paint_agent_arrow
 
 def convolve_exploration(exp_wht):
     """

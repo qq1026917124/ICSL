@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # coding=utf8
-# File: dump_maze.py
-import gym
-import sys
 import os
 import random
 import time
@@ -11,8 +8,8 @@ import argparse
 import multiprocessing
 import pickle
 import .mazeworld
-from .mazeworld import MazeTaskSampler, Resampler, MazeStaticSampler
-from .mazeworld.agents import OracleAgent
+from maze_generator.mazeworld import MazeTaskSampler, Resampler, MazeStaticSampler
+from maze_generator.mazeworld.agents import OracleAgent
 
 current_folder = os.path.dirname(os.path.abspath(__file__))
 if current_folder not in sys.path:

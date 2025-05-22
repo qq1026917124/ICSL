@@ -2,8 +2,8 @@ import sys
 import numpy
 from queue import Queue
 from copy import deepcopy
-from ...envs.dynamics import PI, DEFAULT_ACTION_SPACE_16, DEFAULT_ACTION_SPACE_32
-from ...envs.maze_env import MazeWorldContinuous3D
+from ...mazeworld.envs.dynamics import PI, DEFAULT_ACTION_SPACE_16, DEFAULT_ACTION_SPACE_32
+from ...mazeworld.envs.maze_env import MazeWorldContinuous3D
 
 
 class AgentBase(object):
