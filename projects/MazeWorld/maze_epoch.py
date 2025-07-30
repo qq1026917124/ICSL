@@ -352,7 +352,7 @@ class MazeEpochCausalShort: # the computer
             self.reduce_dim = 1
             
         else:
-            if not os.path.exists(self.config.output): #   线程冲突
+            if not os.path.exists(self.config.output): 
                 os.makedirs(self.config.output)
 
 
