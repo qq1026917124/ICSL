@@ -118,7 +118,7 @@ def cut_data(
             flag = True
 
             n_episode += 1
-            n_end = i + 1 # 跳过全黑
+            n_end = i + 1 
 
             delta = n_end - n_start
             # delta = int((n_end - n_start) * percentage)
